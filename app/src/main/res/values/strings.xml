@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Gallery</string>
+    <string name="app_name">相册</string>
+    <string name="index">%1$01d/%2$01d</string>
 </resources>
