@@ -23,7 +23,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
  *
  * @author zhufeng on 2017/10/22
  */
-public class FrescoImageView extends SimpleDraweeView implements IRender{
+public class FrescoImageView extends SimpleDraweeView implements IRender {
     private PipelineDraweeControllerBuilder mControllerBuilder;
     private IRender mRender;
     private int mWidth = -1;
@@ -87,16 +87,7 @@ public class FrescoImageView extends SimpleDraweeView implements IRender{
         return mControllerBuilder;
     }
 
-    /**
-     * 加载图片入口
-     * eg:
-     * loadImage(1080, 1920, Uri.parse("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg2));
-     * loadImage(1080, 1920, Uri.parse("http://a.hiphotos.baidu.com/image/pic/item/6609c93d70cf3bc7176dd658db00baa1cd112a10.jpg"));
-     *
-     * @param resizeX
-     * @param resizeY
-     * @param uri
-     */
+    @Override
     public void loadImage(int resizeX, int resizeY, Uri uri) {
         ImageRequest request = ImageRequestBuilder
                 .newBuilderWithSource(uri)
