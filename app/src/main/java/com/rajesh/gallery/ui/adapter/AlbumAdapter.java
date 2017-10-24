@@ -54,7 +54,7 @@ public class AlbumAdapter extends PagerAdapter {
         if (zoomImage == null) {
             zoomImage = new ZoomImageView(mContext);
             zoomImage.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            zoomImage.loadImage(1080, 1920, Uri.parse(imageRes.get(position)));
+            zoomImage.loadImage(Uri.parse(imageRes.get(position)));
             viewCache.put(position, zoomImage);
         }
         container.addView(zoomImage);

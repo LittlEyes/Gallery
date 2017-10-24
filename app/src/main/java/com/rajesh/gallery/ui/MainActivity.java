@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         contentView = (ZoomImageView) findViewById(R.id.content);
         albumBtn = (Button) findViewById(R.id.album);
         changeBtn = (Button) findViewById(R.id.change);
-        contentView.loadImage(1080, 1920, Uri.parse(picRes[0]));
+        contentView.loadImage(Uri.parse(picRes[0]));
         contentView.setTag(false);
     }
 
@@ -48,16 +48,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ArrayList<String> imageUrls = new ArrayList<>();
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg1);
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg2);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg1);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg2);
                 imageUrls.add(picRes[0]);
                 imageUrls.add(picRes[1]);
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg1);
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg2);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg1);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg2);
                 imageUrls.add(picRes[0]);
                 imageUrls.add(picRes[1]);
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg1);
-                imageUrls.add("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg2);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg1);
+                imageUrls.add("res://" + MyApp.getAppContext().getPackageName() + "/" + R.mipmap.bg2);
                 imageUrls.add(picRes[0]);
                 imageUrls.add(picRes[1]);
 
@@ -72,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if ((boolean) contentView.getTag()) {
-                    contentView.loadImage(1080, 1920, Uri.parse(picRes[0]));
+                    contentView.loadImage(Uri.parse(picRes[0]));
                     contentView.setTag(false);
                 } else {
                     //contentView.getImageView().loadImage(1080, 1920, Uri.parse("res://"+ MyApp.getAppContext().getPackageName()+"/" + R.mipmap.bg2))
-                    contentView.loadImage(1080, 1920, Uri.parse(picRes[1]));
+                    contentView.loadImage(Uri.parse(picRes[1]));
                     contentView.setTag(true);
                 }
             }

@@ -97,6 +97,15 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
         setController(controller);
     }
 
+    /**
+     * 加载1080P图片
+     *
+     * @param uri
+     */
+    public void loadImage(Uri uri) {
+        loadImage(1080, 1920, uri);
+    }
+
     @Override
     public void onRender(int width, int height) {
 

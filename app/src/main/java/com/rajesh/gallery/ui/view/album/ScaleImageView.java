@@ -3,6 +3,7 @@ package com.rajesh.gallery.ui.view.album;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -188,6 +189,11 @@ public class ScaleImageView extends ViewGroup implements GestureDetector.OnGestu
                         loadImageToWidget();
                     }
                 }
+            }
+
+            @Override
+            public void loadImage(int resizeX, int resizeY, Uri uri) {
+
             }
         });
         addView(mImageView);
