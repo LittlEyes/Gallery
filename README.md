@@ -7,7 +7,7 @@
 - 图片缩放
 - 放大后的图片惯性滑动
 - 可在ViewPager中使用
-- 可用于各大图片加载框架（Fresco，Glide）
+- 可用于各大图片加载框架（Fresco，Glide，Picasso）
 
 ## 三、核心实现方法
 ### 3.1 缩放 Matrix.postScale(float sx, float sy, float px, float py)
