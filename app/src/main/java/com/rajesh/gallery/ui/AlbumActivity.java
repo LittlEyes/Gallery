@@ -1,6 +1,7 @@
 package com.rajesh.gallery.ui;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -34,7 +35,7 @@ public class AlbumActivity extends AppCompatActivity {
     private TextView titleTv;
     private AlbumViewPager mAlbum;
     private AlbumAdapter mAdapter;
-    private ArrayList<String> imageRes = null;
+    private ArrayList<Uri> imageRes = null;
     private int curr = 0;
     private int total = 0;
     private boolean isActionBarShow = false;
@@ -80,7 +81,7 @@ public class AlbumActivity extends AppCompatActivity {
 
 
     private void initData() {
-        imageRes = getIntent().getStringArrayListExtra("res");
+        imageRes = (ArrayList<Uri>) getIntent().getSerializableExtra("res");
         curr = getIntent().getIntExtra("index", 0);
         total = imageRes.size();
         if (imageRes == null || total == 0) {

@@ -16,8 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
-import com.facebook.drawee.drawable.ScalingUtils;
-import com.rajesh.gallery.ui.engine.FrescoImageView;
+import com.rajesh.gallery.ui.engine.GlideImageView;
 
 /**
  * 可缩放图片控件
@@ -25,7 +24,7 @@ import com.rajesh.gallery.ui.engine.FrescoImageView;
  *
  * @author zhufeng on 2016/6/13.
  */
-public class ZoomImageView extends FrescoImageView {
+public class ZoomImageView extends GlideImageView {
     private Context mContext;
     /**
      * 最小缩放比例
@@ -126,8 +125,8 @@ public class ZoomImageView extends FrescoImageView {
 
     private void init(Context context) {
         mContext = context;
-        getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
-        //setScaleType(ScaleType.FIT_CENTER);
+        //使用Fresco时需要设置ScaleType，ImageView默认使用FIT_CENTER
+        //getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
         mMatrix = new Matrix();
         mScaleGestureDetector = new ScaleGestureDetector(mContext, mOnScaleGestureListener);
         mGestureDetector = new GestureDetector(mContext, mOnGestureListener);

@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
-import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -19,12 +18,11 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 /**
- * 添加图片加载完成后的尺寸监听
+ * 提供加载图片宽高
  *
  * @author zhufeng on 2017/10/22
  */
 public class FrescoImageView extends SimpleDraweeView implements IRender {
-    private PipelineDraweeControllerBuilder mControllerBuilder;
     private IRender mRender;
     private int mWidth = -1;
     private int mHeight = -1;
@@ -37,6 +35,7 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
             }
             int preWidth = imageInfo.getWidth();
             int preHeight = imageInfo.getHeight();
+            Log.i("zhufeng_111", "Picasso("+preWidth+","+preHeight+")");
             if (preWidth != mWidth || preHeight != mHeight) {
                 mWidth = preWidth;
                 mHeight = preHeight;
@@ -68,7 +67,6 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
 
     public FrescoImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mControllerBuilder = Fresco.newDraweeControllerBuilder().setControllerListener(controllerListener);
     }
 
     /**
@@ -83,17 +81,13 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
         }
     }
 
-    public PipelineDraweeControllerBuilder getFrescoControllerBuilder() {
-        return mControllerBuilder;
-    }
-
     @Override
     public void loadImage(int resizeX, int resizeY, Uri uri) {
         ImageRequest request = ImageRequestBuilder
                 .newBuilderWithSource(uri)
                 .setResizeOptions(new ResizeOptions(resizeX, resizeY))
                 .build();
-        PipelineDraweeController controller = (PipelineDraweeController) getFrescoControllerBuilder().setOldController(getController()).setImageRequest(request).build();
+        PipelineDraweeController controller = (PipelineDraweeController) Fresco.newDraweeControllerBuilder().setControllerListener(controllerListener).setOldController(getController()).setImageRequest(request).build();
         setController(controller);
     }
 

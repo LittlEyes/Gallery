@@ -6,8 +6,6 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.rajesh.gallery.MyApp;
-import com.rajesh.gallery.R;
 import com.rajesh.gallery.ui.view.album.AlbumViewPager;
 import com.rajesh.gallery.ui.view.album.ZoomImageView;
 
@@ -24,13 +22,13 @@ public class AlbumAdapter extends PagerAdapter {
     /**
      * 展示的图片资源的URL列表
      */
-    private List<String> imageRes;
+    private List<Uri> imageRes;
     /**
      * 存放展示图片的容器，用于删除不用的item
      */
     private HashMap<Integer, ZoomImageView> viewCache;
 
-    public AlbumAdapter(Context mContext, List<String> imageRes) {
+    public AlbumAdapter(Context mContext, List<Uri> imageRes) {
         this.mContext = mContext;
         this.imageRes = imageRes;
         viewCache = new HashMap<>();
@@ -54,7 +52,7 @@ public class AlbumAdapter extends PagerAdapter {
         if (zoomImage == null) {
             zoomImage = new ZoomImageView(mContext);
             zoomImage.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            zoomImage.loadImage(Uri.parse(imageRes.get(position)));
+            zoomImage.loadImage(imageRes.get(position));
             viewCache.put(position, zoomImage);
         }
         container.addView(zoomImage);
