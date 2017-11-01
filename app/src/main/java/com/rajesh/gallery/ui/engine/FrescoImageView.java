@@ -23,7 +23,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
  * @author zhufeng on 2017/10/22
  */
 public class FrescoImageView extends SimpleDraweeView implements IRender {
-    private IRender mRender;
+    private static final String TAG = "FrescoImageView";
     private int mWidth = -1;
     private int mHeight = -1;
 
@@ -35,20 +35,17 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
             }
             int preWidth = imageInfo.getWidth();
             int preHeight = imageInfo.getHeight();
-            Log.i("zhufeng_111", "Picasso("+preWidth+","+preHeight+")");
+            Log.i(TAG, "Fresco drawable size:(" + preWidth + "," + preHeight + ")");
             if (preWidth != mWidth || preHeight != mHeight) {
                 mWidth = preWidth;
                 mHeight = preHeight;
                 onRender(mWidth, mHeight);
-                if (mRender != null) {
-                    mRender.onRender(mWidth, mHeight);
-                }
             }
         }
 
         @Override
         public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-            Log.d("zhufeng", "Intermediate image received");
+            Log.d(TAG, "Intermediate image received");
         }
 
         @Override
@@ -69,19 +66,6 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
         super(context, attrs, defStyleAttr);
     }
 
-    /**
-     * 添加图片加载监听器
-     *
-     * @param render
-     */
-    public void setOnSizeRenderListener(IRender render) {
-        this.mRender = render;
-        if (mWidth != -1 && mHeight != -1 && render != null) {
-            render.onRender(mWidth, mHeight);
-        }
-    }
-
-    @Override
     public void loadImage(int resizeX, int resizeY, Uri uri) {
         ImageRequest request = ImageRequestBuilder
                 .newBuilderWithSource(uri)
@@ -92,10 +76,11 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
     }
 
     /**
-     * 加载1080P图片
+     * load 1080P image
      *
      * @param uri
      */
+    @Override
     public void loadImage(Uri uri) {
         loadImage(1080, 1920, uri);
     }

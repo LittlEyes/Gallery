@@ -21,8 +21,8 @@ import com.bumptech.glide.request.target.Target;
  */
 @SuppressLint("AppCompatCustomView")
 public class GlideImageView extends ImageView implements IRender {
+    private static final String TAG = "GlideImageView";
     private Context mContext;
-    private IRender mRender;
     private int mWidth = -1;
     private int mHeight = -1;
 
@@ -39,14 +39,11 @@ public class GlideImageView extends ImageView implements IRender {
             }
             int preWidth = resource.getIntrinsicWidth();
             int preHeight = resource.getIntrinsicHeight();
-            Log.i("zhufeng_111", "Picasso("+preWidth+","+preHeight+")");
+            Log.i(TAG, "Glide drawable size:(" + preWidth + "," + preHeight + ")");
             if (preWidth != mWidth || preHeight != mHeight) {
                 mWidth = preWidth;
                 mHeight = preHeight;
                 onRender(mWidth, mHeight);
-                if (mRender != null) {
-                    mRender.onRender(mWidth, mHeight);
-                }
             }
             return false;
         }
@@ -65,24 +62,6 @@ public class GlideImageView extends ImageView implements IRender {
         mContext = context;
     }
 
-    /**
-     * 添加图片加载监听器
-     *
-     * @param render
-     */
-    public void setOnSizeRenderListener(IRender render) {
-        this.mRender = render;
-        if (mWidth != -1 && mHeight != -1 && render != null) {
-            render.onRender(mWidth, mHeight);
-        }
-    }
-
-    @Override
-    public void onRender(int width, int height) {
-
-    }
-
-    @Override
     public void loadImage(int resizeX, int resizeY, Uri uri) {
         Glide.with(mContext)
                 .load(uri)
@@ -93,11 +72,17 @@ public class GlideImageView extends ImageView implements IRender {
     }
 
     /**
-     * 加载1080P图片
+     * load 1080P image
      *
      * @param uri
      */
+    @Override
     public void loadImage(Uri uri) {
         loadImage(1080, 1920, uri);
+    }
+
+    @Override
+    public void onRender(int width, int height) {
+
     }
 }

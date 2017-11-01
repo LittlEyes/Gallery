@@ -4,17 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -25,8 +19,8 @@ import com.squareup.picasso.Transformation;
  */
 @SuppressLint("AppCompatCustomView")
 public class PicassoImageView extends ImageView implements IRender {
+    private static final String TAG = "PicassoImageView";
     private Context mContext;
-    private IRender mRender;
     private int mWidth = -1;
     private int mHeight = -1;
 
@@ -38,14 +32,11 @@ public class PicassoImageView extends ImageView implements IRender {
             if (preWidth == 0 || preHeight == 0) {
                 return source;
             }
-            Log.i("zhufeng_111", "Picasso("+preWidth+","+preHeight+")");
+            Log.i(TAG, "Picasso drawable size:(" + preWidth + "," + preHeight + ")");
             if (preWidth != mWidth || preHeight != mHeight) {
                 mWidth = preWidth;
                 mHeight = preHeight;
                 onRender(mWidth, mHeight);
-                if (mRender != null) {
-                    mRender.onRender(mWidth, mHeight);
-                }
             }
             return source;
         }
@@ -53,7 +44,7 @@ public class PicassoImageView extends ImageView implements IRender {
         @Override
         public String key() {
             //这里不唯一的话，同一张图片只会触发一次transform()方法。
-            return "PicassoImageView"+ System.currentTimeMillis();
+            return TAG + System.currentTimeMillis();
         }
     };
 
@@ -70,24 +61,6 @@ public class PicassoImageView extends ImageView implements IRender {
         mContext = context;
     }
 
-    /**
-     * 添加图片加载监听器
-     *
-     * @param render
-     */
-    public void setOnSizeRenderListener(IRender render) {
-        this.mRender = render;
-        if (mWidth != -1 && mHeight != -1 && render != null) {
-            render.onRender(mWidth, mHeight);
-        }
-    }
-
-    @Override
-    public void onRender(int width, int height) {
-
-    }
-
-    @Override
     public void loadImage(int resizeX, int resizeY, Uri uri) {
         Picasso.with(mContext)
                 .load(uri)
@@ -99,11 +72,17 @@ public class PicassoImageView extends ImageView implements IRender {
     }
 
     /**
-     * 加载1080P图片
+     * load 1080P image
      *
      * @param uri
      */
+    @Override
     public void loadImage(Uri uri) {
         loadImage(1080, 1920, uri);
+    }
+
+    @Override
+    public void onRender(int width, int height) {
+
     }
 }

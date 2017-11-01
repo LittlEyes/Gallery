@@ -9,7 +9,7 @@ import android.net.Uri;
  */
 public interface IRender {
     /**
-     * 图片加载完成后公布其真实宽高
+     * publish its width and height after image loaded
      *
      * @param width
      * @param height
@@ -17,11 +17,9 @@ public interface IRender {
     void onRender(int width, int height);
 
     /**
-     * 加载图片
+     * load image
      *
-     * @param resizeX 压缩最大宽
-     * @param resizeY 压缩最大高
      * @param uri     图片Uri
      */
-    void loadImage(int resizeX, int resizeY, Uri uri);
+    void loadImage(Uri uri);
 }

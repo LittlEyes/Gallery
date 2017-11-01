@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
@@ -25,6 +24,7 @@ import com.rajesh.gallery.ui.engine.GlideImageView;
  * @author zhufeng on 2016/6/13.
  */
 public class ZoomImageView extends GlideImageView {
+    private static final String TAG = "ZoomImageView";
     private Context mContext;
     /**
      * 最小缩放比例
@@ -180,7 +180,7 @@ public class ZoomImageView extends GlideImageView {
         mHeight = preHeight;
         mWidgetLoaded = true;
 
-        Log.d("zhufeng", "*****************控件加载成功");
+        Log.d(TAG, "*****************控件加载成功");
         //图片资源已有并且控件还没有加载 || 控件已经加载但控件尺寸发生变化
         boolean needUpdate = mImageLoaded && hasSizeChanged;
         if (needUpdate) {
@@ -199,14 +199,6 @@ public class ZoomImageView extends GlideImageView {
         //转化为缩放后的相对位置
         matrix.mapRect(rectF);
         return rectF;
-    }
-
-    private void marginView(View view, int l, int t, int r, int b) {
-        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-            p.setMargins(l, t, r, b);
-            view.requestLayout();
-        }
     }
 
     /**
@@ -335,8 +327,8 @@ public class ZoomImageView extends GlideImageView {
      */
     private void printStatusLog() {
         RectF rectF = getScaledRect(mMatrix);
-        Log.i("zhufeng", "位置：(" + rectF.left + "," + rectF.top + "," + rectF.right + "," + rectF.bottom + ")");
-        Log.i("zhufeng", "是否原始大小：" + isZoomToOriginalSize() + ", 是否靠左：" + isLeftSide() + " ,是否靠右：" + isRightSide());
+        Log.i(TAG, "位置：(" + rectF.left + "," + rectF.top + "," + rectF.right + "," + rectF.bottom + ")");
+        Log.i(TAG, "是否原始大小：" + isZoomToOriginalSize() + ", 是否靠左：" + isLeftSide() + " ,是否靠右：" + isRightSide());
     }
 
     /**
@@ -532,8 +524,6 @@ public class ZoomImageView extends GlideImageView {
         }
     }
 
-    //公开方法
-
     private void setDrawableToView() {
         float imageRatio = (float) mImageWidth / (float) mImageHeight;
         float widgetRatio = (float) mWidth / (float) mHeight;
@@ -545,17 +535,24 @@ public class ZoomImageView extends GlideImageView {
             mImageHeight = mHeight;
         }
         mImageRectF = new RectF((float) (mWidth - mImageWidth) / 2, (float) (mHeight - mImageHeight) / 2, (float) (mWidth + mImageWidth) / 2, (float) (mHeight + mImageHeight) / 2);
-        Log.i("zhufeng_2", "控件宽高：（" + mWidth + " ," + mHeight + "）");
-        Log.i("zhufeng_2", "图片宽高：（" + mImageWidth + " ," + mImageHeight + "）");
-        Log.i("zhufeng_2", "图片区域：（" + mImageRectF.left + " ," + mImageRectF.top + " ," + mImageRectF.right + " ," + mImageRectF.bottom + "）");
+        Log.i(TAG, "widget size：（" + mWidth + " ," + mHeight + "）");
+        Log.i(TAG, "drawable size：（" + mImageWidth + " ," + mImageHeight + "）");
+        Log.i(TAG, "drawable rect：[" + mImageRectF.left + " ," + mImageRectF.top + " ," + mImageRectF.right + " ," + mImageRectF.bottom + "]");
     }
 
+    /**
+     * reset the image
+     */
     public void reset() {
         mMatrix.reset();
         mScale = ORIGINAL_SCALE;
         mIsLeftSide = true;
         mIsRightSide = true;
         invalidate();
+    }
+
+    public float getScale(){
+        return mScale;
     }
 
     public boolean isZoomToOriginalSize() {
@@ -571,7 +568,7 @@ public class ZoomImageView extends GlideImageView {
     }
 
     /**
-     * 用于ViewPager滑动拦截
+     * for method 'canScroll' in {@link AlbumViewPager}
      *
      * @param direction
      * @return
