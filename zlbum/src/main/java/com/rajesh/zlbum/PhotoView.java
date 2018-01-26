@@ -1,4 +1,4 @@
-package com.rajesh.gallery.ui.view.album;
+package com.rajesh.zlbum;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -15,21 +15,23 @@ import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
-import com.rajesh.gallery.ui.engine.GlideImageView;
+import com.rajesh.zlbum.engine.FrescoImageView;
+import com.rajesh.zlbum.pull.OnPullProgressListener;
 
 /**
  * 可缩放图片控件
  * 实现原理：通过Matrix操控ImageView中内容的缩放和移动
+ * 针对不同的网络加载框架，继承不同的engine即可
  *
  * @author zhufeng on 2016/6/13.
  */
-public class ZoomImageView extends GlideImageView {
-    private static final String TAG = "ZoomImageView";
+public class PhotoView extends FrescoImageView {
+    private static final String TAG = "PhotoView";
     private Context mContext;
     /**
      * 最小缩放比例
      */
-    private static final float MIN_SCALE = 0.9F;
+    private static final float MIN_SCALE = 0.95F;
     /**
      * 最大缩放比例
      */
@@ -37,7 +39,15 @@ public class ZoomImageView extends GlideImageView {
     /**
      * 初始比例
      */
-    private static final float ORIGINAL_SCALE = 1.0f;
+    private static final float ORIGINAL_SCALE = 1.0F;
+    /**
+     * 下拉退出能达到的最小缩放比例
+     */
+    private static final float MIN_PULL_SCALE = 0.2F;
+    /**
+     * 下拉退出的临界缩放比例
+     */
+    private static final float PULL_FINISH_SCALE = 0.7F;
     /**
      * 初始状态下控件的宽高
      */
@@ -55,11 +65,11 @@ public class ZoomImageView extends GlideImageView {
     /**
      * 控件是否加载成功
      */
-    private boolean mWidgetLoaded = false;
+    private boolean isWidgetLoaded = false;
     /**
      * 待缩放图片是否已经设置
      */
-    private boolean mImageLoaded = false;
+    private boolean isImageLoaded = false;
     /**
      * 手势监听
      */
@@ -74,13 +84,9 @@ public class ZoomImageView extends GlideImageView {
      */
     private int mMaximumVelocity;
     /**
-     * 缩放焦点-X坐标
+     * 缩放焦点
      */
-    private float focusX;
-    /**
-     * 缩放焦点-Y坐标
-     */
-    private float focusY;
+    private float focusX, focusY;
     /**
      * 是否单指操作（多指操作都交给缩放）
      */
@@ -100,33 +106,40 @@ public class ZoomImageView extends GlideImageView {
     /**
      * 是否触及左边界
      */
-    private boolean mIsLeftSide = true;
+    private boolean isLeftSide = true;
     /**
      * 是否触及右边界
      */
-    private boolean mIsRightSide = true;
+    private boolean isRightSide = true;
     /**
      * 单击监听
      */
     private View.OnClickListener mOnClickListener;
+    /**
+     * 下拉退出功能
+     */
+    private boolean canPullFinish = false;
+    private float mDownX;
+    private float mDownY;
+    private boolean isFinishModel = false;
+    private float mPullScale;
+    private OnPullProgressListener mProgressListener;
 
-    public ZoomImageView(Context context) {
+    public PhotoView(Context context) {
         this(context, null);
     }
 
-    public ZoomImageView(Context context, AttributeSet attrs) {
+    public PhotoView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ZoomImageView(Context context, AttributeSet attrs, int defStyle) {
+    public PhotoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
 
     private void init(Context context) {
         mContext = context;
-        //使用Fresco时需要设置ScaleType，ImageView默认使用FIT_CENTER
-        //getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
         mMatrix = new Matrix();
         mScaleGestureDetector = new ScaleGestureDetector(mContext, mOnScaleGestureListener);
         mGestureDetector = new GestureDetector(mContext, mOnGestureListener);
@@ -148,6 +161,7 @@ public class ZoomImageView extends GlideImageView {
     public boolean onTouchEvent(MotionEvent event) {
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN) {
             isAlwaysSingleTouch = true;
+            isFinishModel = false;
         }
         if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_POINTER_UP) {
             pointerUp();
@@ -178,11 +192,11 @@ public class ZoomImageView extends GlideImageView {
         }
         mWidth = preWidth;
         mHeight = preHeight;
-        mWidgetLoaded = true;
+        isWidgetLoaded = true;
 
         Log.d(TAG, "*****************控件加载成功");
         //图片资源已有并且控件还没有加载 || 控件已经加载但控件尺寸发生变化
-        boolean needUpdate = mImageLoaded && hasSizeChanged;
+        boolean needUpdate = isImageLoaded && hasSizeChanged;
         if (needUpdate) {
             setDrawableToView();
         }
@@ -207,66 +221,39 @@ public class ZoomImageView extends GlideImageView {
     private void pointerUp() {
         if (mScale < ORIGINAL_SCALE) {
             reset();
+            checkBorder();
         } else if (mScale > MAX_SCALE) {
             //超出最大后增加回弹
             float scaleFactor = MAX_SCALE / mScale;
             mScale = MAX_SCALE;
             mMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
             invalidate();
+            checkBorder();
+        } else if (mScale == ORIGINAL_SCALE && isFinishModel) {
+            if (mProgressListener != null) {
+                mProgressListener.stopPull(mPullScale < PULL_FINISH_SCALE);
+            }
+            if (mPullScale >= PULL_FINISH_SCALE) {
+                reset();
+                checkBorder();
+            }
         }
-        checkBorder();
     }
 
     /**
      * 缩放时检查图片边缘，并添加相应的移动做调整
      */
-    private void constrainScale() {
-        float dx = 0;
-        float dy = 0;
-        RectF rectF = getScaledRect(mMatrix);
-        float scaleImageWidth = rectF.width();
-        float scaleImageHeight = rectF.height();
-
-        if (scaleImageWidth > mWidth) {
-            //right
-            if (rectF.right < mWidth) {
-                dx = -rectF.right + mWidth;
-            }
-            //left
-            if (rectF.left > 0) {
-                dx = -rectF.left;
-            }
-        } else {
-            //center
-            dx = -rectF.left + ((float) mWidth - scaleImageWidth) / 2;
-        }
-
-        if (scaleImageHeight > mHeight) {
-            //bottom
-            if (rectF.bottom < mHeight) {
-                dy = -rectF.bottom + mHeight;
-            }
-            //top
-            if (rectF.top > 0) {
-                dy = -rectF.top;
-            }
-        } else {
-            //center
-            dy = -rectF.top + ((float) mHeight - scaleImageHeight) / 2;
-        }
-
-        mMatrix.postTranslate(dx, dy);
-        invalidate();
-        checkBorder();
+    private void constrainMatrix() {
+        constrainMatrix(0, 0);
     }
 
     /**
-     * 针对边缘问题，约束移动
+     * 缩放时检查图片边缘，并添加相应的移动做调整
      *
      * @param dx
      * @param dy
      */
-    private void constrainScrollBy(float dx, float dy) {
+    private void constrainMatrix(float dx, float dy) {
         RectF rectF = getScaledRect(mMatrix);
         float scaleImageWidth = rectF.width();
         float scaleImageHeight = rectF.height();
@@ -310,14 +297,14 @@ public class ZoomImageView extends GlideImageView {
     private void checkBorder() {
         RectF rectF = getScaledRect(mMatrix);
         if (rectF.left >= 0) {
-            mIsLeftSide = true;
+            isLeftSide = true;
         } else {
-            mIsLeftSide = false;
+            isLeftSide = false;
         }
         if (rectF.right <= mWidth) {
-            mIsRightSide = true;
+            isRightSide = true;
         } else {
-            mIsRightSide = false;
+            isRightSide = false;
         }
         printStatusLog();
     }
@@ -328,7 +315,7 @@ public class ZoomImageView extends GlideImageView {
     private void printStatusLog() {
         RectF rectF = getScaledRect(mMatrix);
         Log.i(TAG, "位置：(" + rectF.left + "," + rectF.top + "," + rectF.right + "," + rectF.bottom + ")");
-        Log.i(TAG, "是否原始大小：" + isZoomToOriginalSize() + ", 是否靠左：" + isLeftSide() + " ,是否靠右：" + isRightSide());
+        Log.i(TAG, "是否原始大小：" + isOriginalSize() + ", 是否靠左：" + isLeftSide() + " ,是否靠右：" + isRightSide());
     }
 
     /**
@@ -338,6 +325,9 @@ public class ZoomImageView extends GlideImageView {
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            if (!isImageLoaded) {
+                return false;
+            }
             float scaleFactor = detector.getScaleFactor();
             float wantScale = mScale * scaleFactor;
             if (wantScale >= MIN_SCALE) {
@@ -346,7 +336,7 @@ public class ZoomImageView extends GlideImageView {
                 focusY = detector.getFocusY();
                 mMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
                 invalidate();
-                constrainScale();
+                constrainMatrix();
             }
             return true;
         }
@@ -367,9 +357,50 @@ public class ZoomImageView extends GlideImageView {
         }
 
         @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (!isAlwaysSingleTouch) {
+                return true;
+            }
+            if (mScale == ORIGINAL_SCALE) {
+                if (!isFinishModel) {
+                    if (canPullFinish && distanceY < 0 && Math.abs(distanceY) > Math.abs(distanceX)) {
+                        isFinishModel = true;
+                        mDownX = e2.getX();
+                        mDownY = e2.getY();
+                        if (mProgressListener != null) {
+                            mProgressListener.startPull();
+                        }
+                    }
+                } else {
+                    //进入下拉退出模式
+                    float deltaX = e2.getX() - mDownX;
+                    float deltaY = e2.getY() - mDownY;
+                    mPullScale = ORIGINAL_SCALE;
+                    if (deltaY > 0) {
+                        float deltaScale = (deltaY / (float) mHeight * 3 / 2) * (ORIGINAL_SCALE - MIN_PULL_SCALE);
+                        mPullScale = ORIGINAL_SCALE - deltaScale;
+                    }
+                    mMatrix.setScale(mPullScale, mPullScale, mWidth / 2, mHeight / 2);
+                    mMatrix.postTranslate(deltaX, deltaY);
+                    invalidate();
+                    if (mProgressListener != null) {
+                        mProgressListener.onProgress(mPullScale);
+                    }
+                }
+                return false;
+            }
+            if (!isImageLoaded) {
+                return true;
+            }
+            constrainMatrix(-distanceX, -distanceY);
+            checkBorder();
+            return false;
+        }
+
+        @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             if (mOnClickListener != null) {
-                mOnClickListener.onClick(ZoomImageView.this);
+                mOnClickListener.onClick(PhotoView.this);
             }
             return true;
         }
@@ -377,6 +408,9 @@ public class ZoomImageView extends GlideImageView {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             if (!isAlwaysSingleTouch) {
+                return true;
+            }
+            if (!isImageLoaded) {
                 return true;
             }
             float x = e.getX();
@@ -393,18 +427,11 @@ public class ZoomImageView extends GlideImageView {
         }
 
         @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (!isAlwaysSingleTouch) {
                 return true;
             }
-            constrainScrollBy(-distanceX, -distanceY);
-            checkBorder();
-            return false;
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (!isAlwaysSingleTouch) {
+            if (!isImageLoaded) {
                 return true;
             }
             float absVelocityX = Math.abs(velocityX);
@@ -473,7 +500,7 @@ public class ZoomImageView extends GlideImageView {
                 int dx = x - mLastFlingX;
                 mLastFlingY = y;
                 mLastFlingX = x;
-                constrainScrollBy(dx, dy);
+                constrainMatrix(dx, dy);
                 postOnAnimation();
             }
             enableRunOnAnimationRequests();
@@ -508,7 +535,7 @@ public class ZoomImageView extends GlideImageView {
                 mReSchedulePostAnimationCallback = true;
             } else {
                 removeCallbacks(this);
-                ViewCompat.postOnAnimation(ZoomImageView.this, this);
+                ViewCompat.postOnAnimation(PhotoView.this, this);
             }
         }
     }
@@ -518,8 +545,8 @@ public class ZoomImageView extends GlideImageView {
         super.onRender(width, height);
         mImageWidth = width;
         mImageHeight = height;
-        mImageLoaded = true;
-        if (mWidgetLoaded) {
+        isImageLoaded = true;
+        if (isWidgetLoaded) {
             setDrawableToView();
         }
     }
@@ -541,30 +568,37 @@ public class ZoomImageView extends GlideImageView {
     }
 
     /**
+     * 开启下拉退出功能
+     */
+    public void openPullToFinish() {
+        this.canPullFinish = true;
+    }
+
+    /**
      * reset the image
      */
     public void reset() {
         mMatrix.reset();
         mScale = ORIGINAL_SCALE;
-        mIsLeftSide = true;
-        mIsRightSide = true;
+        isLeftSide = true;
+        isRightSide = true;
         invalidate();
     }
 
-    public float getScale(){
+    public float getScale() {
         return mScale;
     }
 
-    public boolean isZoomToOriginalSize() {
+    public boolean isOriginalSize() {
         return mScale == ORIGINAL_SCALE;
     }
 
     public boolean isLeftSide() {
-        return mIsLeftSide;
+        return isLeftSide;
     }
 
     public boolean isRightSide() {
-        return mIsRightSide;
+        return isRightSide;
     }
 
     /**
@@ -574,11 +608,16 @@ public class ZoomImageView extends GlideImageView {
      * @return
      */
     public boolean canScroll(int direction) {
-        return !((direction < 0 && isRightSide()) || (direction > 0 && isLeftSide()));
+        return !((direction < 0 && isRightSide) || (direction > 0 && isLeftSide));
     }
 
     @Override
     public void setOnClickListener(View.OnClickListener listener) {
         this.mOnClickListener = listener;
     }
+
+    public void setOnPullProgressListener(OnPullProgressListener l) {
+        this.mProgressListener = l;
+    }
+
 }

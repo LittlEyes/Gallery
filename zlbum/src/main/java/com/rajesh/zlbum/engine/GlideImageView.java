@@ -1,4 +1,4 @@
-package com.rajesh.gallery.ui.engine;
+package com.rajesh.zlbum.engine;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +13,7 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.rajesh.zlbum.R;
 
 /**
  * 提供加载图片宽高
@@ -66,6 +67,9 @@ public class GlideImageView extends ImageView implements IRender {
         Glide.with(mContext)
                 .load(uri)
                 .override(resizeX, resizeY)
+                .placeholder(R.mipmap.ic_load_error)
+                .error(R.mipmap.ic_load_error)
+                .crossFade()
                 .priority(Priority.HIGH)
                 .listener(mUriRequestListener)
                 .into(this);

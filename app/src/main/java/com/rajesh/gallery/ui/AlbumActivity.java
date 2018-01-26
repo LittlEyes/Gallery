@@ -4,7 +4,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -19,8 +20,7 @@ import android.widget.TextView;
 
 import com.rajesh.gallery.MyApp;
 import com.rajesh.gallery.R;
-import com.rajesh.gallery.ui.adapter.AlbumAdapter;
-import com.rajesh.gallery.ui.view.album.AlbumViewPager;
+import com.rajesh.zlbum.ui.AlbumFragment;
 
 import java.util.ArrayList;
 
@@ -30,37 +30,94 @@ import java.util.ArrayList;
  * @author zhufeng on 2017/10/22
  */
 public class AlbumActivity extends AppCompatActivity {
-    private LinearLayout actionBar;
-    private ImageView backBtn;
-    private TextView titleTv;
-    private AlbumViewPager mAlbum;
-    private AlbumAdapter mAdapter;
-    private ArrayList<Uri> imageRes = null;
+    private AlbumFragment mAlbumView;
+    private LinearLayout mActionBar;
+    private ImageView mBackBtn;
+    private TextView mTitleTv;
+    private ArrayList<Uri> mData = null;
     private int curr = 0;
     private int total = 0;
-    private boolean isActionBarShow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         setContentView(R.layout.activity_album);
-        initView();
+        translucentStatusBar();
         initData();
-        initEvents();
+        setupView();
     }
 
-    private void initView() {
-        actionBar = (LinearLayout) findViewById(R.id.action_bar_album);
-        backBtn = (ImageView) findViewById(R.id.back);
-        titleTv = (TextView) findViewById(R.id.title);
-        mAlbum = (AlbumViewPager) findViewById(R.id.content);
-        translucentStatusBar();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            actionBar.setPadding(0, dp2Px(20), 0, 0);
-        } else {
-            actionBar.setPadding(0, 0, 0, 0);
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void initData() {
+        mData = (ArrayList<Uri>) getIntent().getSerializableExtra("res");
+        curr = getIntent().getIntExtra("index", 0);
+        total = mData.size();
+        if (mData == null || total == 0) {
+            finish();
+            return;
         }
 
+    }
+
+    private void setupView() {
+        mActionBar = (LinearLayout) findViewById(R.id.action_holder);
+        mBackBtn = (ImageView) findViewById(R.id.back);
+        mTitleTv = (TextView) findViewById(R.id.title);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mActionBar.setPadding(0, dp2Px(20), 0, 0);
+        } else {
+            mActionBar.setPadding(0, 0, 0, 0);
+        }
+
+        mTitleTv.setText(String.format(getString(R.string.index), curr + 1, total));
+
+        if (mAlbumView == null) {
+            mAlbumView = AlbumFragment.newInstance(mData);
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(R.id.content, mAlbumView, AlbumFragment.class.getName());
+            transaction.commit();
+        }
+
+        mBackBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        mAlbumView.setOnAlbumEventListener(new AlbumFragment.OnAlbumEventListener() {
+            @Override
+            public void onClick() {
+                if (mActionBar.getVisibility() == View.VISIBLE) {
+                    hideActionBar();
+                } else {
+                    showActionBar();
+                }
+            }
+
+            @Override
+            public void onPageChanged(int page) {
+                mTitleTv.setText(String.format(getString(R.string.index), curr + 1, total));
+            }
+
+            @Override
+            public void onStartPull() {
+                hideActionBar();
+            }
+
+            @Override
+            public void onPullFinished() {
+                finish();
+            }
+        });
     }
 
     private void translucentStatusBar() {
@@ -79,77 +136,20 @@ public class AlbumActivity extends AppCompatActivity {
         }
     }
 
-
-    private void initData() {
-        imageRes = (ArrayList<Uri>) getIntent().getSerializableExtra("res");
-        curr = getIntent().getIntExtra("index", 0);
-        total = imageRes.size();
-        if (imageRes == null || total == 0) {
-            finish();
+    private void showActionBar() {
+        if (mActionBar.getVisibility() == View.VISIBLE) {
             return;
         }
-        titleTv.setText(String.format(getString(R.string.index), curr + 1, total));
-        mAdapter = new AlbumAdapter(MyApp.getAppContext(), imageRes);
-        mAlbum.setPageMargin(30);
-        mAlbum.setAdapter(mAdapter);
-        mAlbum.setOffscreenPageLimit(1);
-        mAlbum.setCurrentItem(curr, false);
-    }
-
-    private void initEvents() {
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        mAlbum.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                curr = position;
-                titleTv.setText(String.format(getString(R.string.index), curr + 1, total));
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        mAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isActionBarShow) {
-                    hideActionBar();
-                } else {
-                    showActionBar();
-                }
-            }
-        });
-    }
-
-    /**
-     * 动画展示actionbar
-     */
-    private void showActionBar() {
-        isActionBarShow = true;
-        actionBar.setVisibility(View.VISIBLE);
+        mActionBar.setVisibility(View.VISIBLE);
         Animation startAnim = AnimationUtils.loadAnimation(this, R.anim.action_bar_show);
         startAnim.setFillAfter(true);
-        actionBar.startAnimation(startAnim);
+        mActionBar.startAnimation(startAnim);
     }
 
-    /**
-     * 动画隐藏actionbar
-     */
     private void hideActionBar() {
-        isActionBarShow = false;
+        if (mActionBar.getVisibility() == View.GONE) {
+            return;
+        }
         Animation hideAnim = AnimationUtils.loadAnimation(this, R.anim.action_bar_hide);
         hideAnim.setFillAfter(true);
         hideAnim.setAnimationListener(new Animation.AnimationListener() {
@@ -160,8 +160,8 @@ public class AlbumActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                actionBar.setVisibility(View.GONE);
-                actionBar.clearAnimation();
+                mActionBar.setVisibility(View.GONE);
+                mActionBar.clearAnimation();
             }
 
             @Override
@@ -169,7 +169,7 @@ public class AlbumActivity extends AppCompatActivity {
 
             }
         });
-        actionBar.startAnimation(hideAnim);
+        mActionBar.startAnimation(hideAnim);
     }
 
     public int dp2Px(int dp) {

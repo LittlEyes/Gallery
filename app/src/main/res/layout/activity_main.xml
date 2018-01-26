@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
     android:orientation="vertical">
 
     <Button
@@ -19,7 +18,7 @@
         android:background="@android:color/white"
         android:text="换图" />
 
-    <com.rajesh.gallery.ui.view.album.ZoomImageView
+    <com.rajesh.zlbum.PhotoView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

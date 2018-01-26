@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.rajesh.gallery.MyApp;
 import com.rajesh.gallery.R;
-import com.rajesh.gallery.ui.view.album.ZoomImageView;
+import com.rajesh.zlbum.PhotoView;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     };
     private Button albumBtn;
     private Button changeBtn;
-    private ZoomImageView contentView;
+    private PhotoView contentView;
     /**
      * 是否是显示的第一个图片，仅用于contentView的图片点击切换
      */
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        contentView = (ZoomImageView) findViewById(R.id.content);
+        contentView = (PhotoView) findViewById(R.id.content);
         albumBtn = (Button) findViewById(R.id.album);
         changeBtn = (Button) findViewById(R.id.change);
         contentView.loadImage(Uri.parse(picRes[0]));
@@ -67,10 +67,8 @@ public class MainActivity extends AppCompatActivity {
                 imageUrls.add(Uri.parse(picRes[0]));
                 imageUrls.add(Uri.parse(picRes[1]));
 
-
                 Intent intent = new Intent(MainActivity.this, AlbumActivity.class);
                 intent.putExtra("res", imageUrls);
-                intent.putExtra("title", "相册");
 
                 startActivity(intent);
             }
@@ -96,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     public Uri getUriFromRes(int id) {
-        boolean isFresco = false;
+        boolean isFresco = true;
         if (isFresco) {
             //Fresco针对res的处理方式有所不同
             return Uri.parse("res://" + MyApp.getAppContext().getPackageName() + "/" + id);

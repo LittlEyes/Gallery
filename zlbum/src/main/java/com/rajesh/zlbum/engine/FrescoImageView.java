@@ -1,7 +1,8 @@
-package com.rajesh.gallery.ui.engine;
+package com.rajesh.zlbum.engine;
 
 import android.content.Context;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -11,11 +12,16 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.drawable.AutoRotateDrawable;
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.rajesh.zlbum.R;
 
 /**
  * 提供加载图片宽高
@@ -64,9 +70,22 @@ public class FrescoImageView extends SimpleDraweeView implements IRender {
 
     public FrescoImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
     }
 
     public void loadImage(int resizeX, int resizeY, Uri uri) {
+        Drawable roundingParams = getResources().getDrawable(R.mipmap.ic_loading);
+        AutoRotateDrawable progressDrawable = new AutoRotateDrawable(roundingParams, 1000);
+
+        GenericDraweeHierarchyBuilder builder = new GenericDraweeHierarchyBuilder(getResources());
+        GenericDraweeHierarchy hierarchy = builder
+                .setFadeDuration(200)
+                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
+                .setProgressBarImage(progressDrawable, ScalingUtils.ScaleType.CENTER_INSIDE)
+                .setFailureImage(R.mipmap.ic_load_error, ScalingUtils.ScaleType.CENTER_INSIDE)
+                .build();
+        setHierarchy(hierarchy);
+
         ImageRequest request = ImageRequestBuilder
                 .newBuilderWithSource(uri)
                 .setResizeOptions(new ResizeOptions(resizeX, resizeY))

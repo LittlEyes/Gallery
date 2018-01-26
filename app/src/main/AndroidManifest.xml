@@ -24,7 +24,7 @@
             android:name=".ui.AlbumActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.Transparent.NoActionBar" />
     </application>
 
 </manifest>
