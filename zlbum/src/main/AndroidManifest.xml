@@ -8,6 +8,6 @@
     <application>
         <activity
             android:name=".ui.AlbumActivity"
-            android:theme="@style/AppTheme.Transparent.NoActionBar" />
+            android:theme="@style/AlbumTheme.Transparent.NoActionBar" />
     </application>
 </manifest>
