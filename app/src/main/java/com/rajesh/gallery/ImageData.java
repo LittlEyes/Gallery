@@ -13,8 +13,8 @@ public class ImageData {
      * image from url
      */
     public static String[] picUrls = new String[]{
-            "http://a.hiphotos.baidu.com/image/pic/item/6609c93d70cf3bc7176dd658db00baa1cd112a10.jpg",
-            "http://a.hiphotos.baidu.com/image/pic/item/b2de9c82d158ccbf1c48af8e13d8bc3eb0354189.jpg"
+            "http://a3.topitme.com/5/27/a3/111614045060aa3275l.jpg",
+            "http://img4.duitang.com/uploads/item/201406/20/20140620155726_ch85t.jpeg"
     };
 
     /**
