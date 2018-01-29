@@ -25,7 +25,6 @@ public class AlbumFragment extends Fragment {
     private AlbumViewPager mAlbumView;
     private AlbumAdapter mAdapter;
     private ArrayList<Uri> mDataList = null;
-    private int curr = -1;
     private OnAlbumEventListener mListener;
 
     public static AlbumFragment newInstance(ArrayList<Uri> data) {
@@ -36,27 +35,14 @@ public class AlbumFragment extends Fragment {
         return fragment;
     }
 
-    public static AlbumFragment newInstance(ArrayList<Uri> data, int curr) {
-        AlbumFragment fragment = new AlbumFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("data", data);
-        bundle.putInt("index", curr);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mDataList = (ArrayList<Uri>) getArguments().getSerializable("data");
-            curr = getArguments().getInt("index", -1);
         }
         if (mDataList == null) {
             mDataList = new ArrayList<>();
-        }
-        if (mDataList.size() == 0) {
-            curr = -1;
         }
     }
 
@@ -78,9 +64,6 @@ public class AlbumFragment extends Fragment {
         mAlbumView.setPageMargin(30);
         mAlbumView.setAdapter(mAdapter);
         mAlbumView.setOffscreenPageLimit(1);
-        if (curr >= 0) {
-            mAlbumView.setCurrentItem(curr, false);
-        }
 
         mAlbumView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -90,9 +73,8 @@ public class AlbumFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                curr = position;
                 if (mListener != null) {
-                    mListener.onPageChanged(curr);
+                    mListener.onPageChanged(position);
                 }
             }
 

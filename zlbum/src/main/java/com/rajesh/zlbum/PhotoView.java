@@ -420,6 +420,7 @@ public class PhotoView extends FrescoImageView {
                 mScale = MAX_SCALE;
                 mMatrix.postScale(scaleFactor, scaleFactor, x, y);
                 invalidate();
+                checkBorder();
             } else {
                 reset();
             }
@@ -434,6 +435,9 @@ public class PhotoView extends FrescoImageView {
             if (!isImageLoaded) {
                 return true;
             }
+            if (mScale == ORIGINAL_SCALE) {
+                return true;
+            }
             float absVelocityX = Math.abs(velocityX);
             if (absVelocityX < mMinimumVelocity) {
                 absVelocityX = 0F;
@@ -446,7 +450,6 @@ public class PhotoView extends FrescoImageView {
             } else {
                 absVelocityY = Math.max(mMinimumVelocity, Math.min(absVelocityY, mMaximumVelocity));
             }
-
             if (absVelocityX != 0 || absVelocityY != 0) {
                 mFlingUtil.fling((int) (velocityX > 0 ? absVelocityX : -absVelocityX), (int) (velocityY > 0 ? absVelocityY : -absVelocityY));
             }
