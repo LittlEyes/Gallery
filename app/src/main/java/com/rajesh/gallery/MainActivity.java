@@ -25,12 +25,17 @@ public class MainActivity extends AppCompatActivity {
      * 是否是显示的第一个图片，仅用于contentView的图片点击切换
      */
     private boolean isFirstImage = true;
+    /**
+     * can be converted to ArrayList<Uri>
+     */
+    private ArrayList<String> imageUri = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        initAlbumData();
         initEvents();
     }
 
@@ -42,26 +47,28 @@ public class MainActivity extends AppCompatActivity {
         isFirstImage = true;
     }
 
+    private void initAlbumData() {
+        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg1));
+        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg2));
+        imageUri.add(ImageData.picUrls[0]);
+        imageUri.add(ImageData.picUrls[1]);
+        imageUri.add(ImageData.getUri(ImageData.picPaths[0]));
+        imageUri.add(ImageData.getUri(ImageData.picPaths[1]));
+        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg1));
+        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg2));
+        imageUri.add(ImageData.picUrls[0]);
+        imageUri.add(ImageData.picUrls[1]);
+        imageUri.add(ImageData.getUri(ImageData.picPaths[0]));
+        imageUri.add(ImageData.getUri(ImageData.picPaths[1]));
+    }
+
     private void initEvents() {
         albumBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> imageUrls = new ArrayList<>();
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg1));
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg2));
-                imageUrls.add(ImageData.picUrls[0]);
-                imageUrls.add(ImageData.picUrls[1]);
-                imageUrls.add(ImageData.getUri(ImageData.picPaths[0]));
-                imageUrls.add(ImageData.getUri(ImageData.picPaths[1]));
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg1));
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg2));
-                imageUrls.add(ImageData.picUrls[0]);
-                imageUrls.add(ImageData.picUrls[1]);
-                imageUrls.add(ImageData.getUri(ImageData.picPaths[0]));
-                imageUrls.add(ImageData.getUri(ImageData.picPaths[1]));
-
                 Intent intent = new Intent(MainActivity.this, AlbumActivity.class);
-                intent.putExtra(AlbumActivity.INTENT_IMAGE, imageUrls);
+                intent.putExtra(AlbumActivity.INTENT_IMAGE, imageUri);
+                intent.putExtra(AlbumActivity.INTENT_INDEX, 0);
                 startActivity(intent);
             }
         });
