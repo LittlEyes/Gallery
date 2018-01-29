@@ -15,9 +15,9 @@
 <activity android:name="com.rajesh.zlbum.ui.AlbumActivity" />
 ```
 
-### 3.2 跳转
+### 3.2 使用
 ```java
-//数据需要能被转换为URI，用于展示
+//数据以ArrayList<String>的形式传递，传递完成后通过Uri.parse方法转换为ArrayList<Uri>
 ArrayList<String> imageUri = new ArrayList<>();
 
 Intent intent = new Intent(MainActivity.this, AlbumActivity.class);
