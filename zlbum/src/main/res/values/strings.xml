@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Zlbum</string>
+    <string name="index">%1$01d/%2$01d</string>
 </resources>

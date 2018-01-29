@@ -1,4 +1,4 @@
-package com.rajesh.zlbum;
+package com.rajesh.zlbum.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -16,7 +16,7 @@ import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
 import com.rajesh.zlbum.engine.FrescoImageView;
-import com.rajesh.zlbum.pull.OnPullProgressListener;
+import com.rajesh.zlbum.widget.pull.OnPullProgressListener;
 
 /**
  * 可缩放图片控件

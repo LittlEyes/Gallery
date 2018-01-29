@@ -1,4 +1,4 @@
-package com.rajesh.zlbum.pull;
+package com.rajesh.zlbum.widget.pull;
 
 /**
  * 下拉退出进度监听

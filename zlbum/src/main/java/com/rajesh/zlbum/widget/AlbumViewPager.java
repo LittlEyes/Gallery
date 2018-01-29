@@ -1,11 +1,11 @@
-package com.rajesh.zlbum;
+package com.rajesh.zlbum.widget;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.rajesh.zlbum.pull.OnPullProgressListener;
+import com.rajesh.zlbum.widget.pull.OnPullProgressListener;
 
 /**
  * 相册ViewPager

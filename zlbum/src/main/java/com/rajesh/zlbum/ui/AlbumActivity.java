@@ -1,7 +1,6 @@
-package com.rajesh.gallery.ui;
+package com.rajesh.zlbum.ui;
 
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -18,9 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.rajesh.gallery.MyApp;
-import com.rajesh.gallery.R;
-import com.rajesh.zlbum.ui.AlbumFragment;
+import com.rajesh.zlbum.R;
 
 import java.util.ArrayList;
 
@@ -30,11 +27,13 @@ import java.util.ArrayList;
  * @author zhufeng on 2017/10/22
  */
 public class AlbumActivity extends AppCompatActivity {
+    public static final String INTENT_IMAGE = "image";
+    public static final String INTENT_INDEX = "index";
     private AlbumFragment mAlbumView;
     private LinearLayout mActionBar;
     private ImageView mBackBtn;
     private TextView mTitleTv;
-    private ArrayList<Uri> mData = null;
+    private ArrayList<String> mData = null;
     private int curr = 0;
     private int total = 0;
 
@@ -45,7 +44,6 @@ public class AlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_album);
         translucentStatusBar();
         initData();
-        setupView();
     }
 
     @Override
@@ -55,31 +53,30 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        mData = (ArrayList<Uri>) getIntent().getSerializableExtra("res");
-        curr = getIntent().getIntExtra("index", 0);
+        mData = getIntent().getStringArrayListExtra(INTENT_IMAGE);
+        curr = getIntent().getIntExtra(INTENT_INDEX, 0);
         total = mData.size();
-        if (mData == null || total == 0) {
+        if (mData == null) {
             finish();
             return;
         }
-
+        setupView();
     }
 
     private void setupView() {
         mActionBar = (LinearLayout) findViewById(R.id.action_holder);
-        mBackBtn = (ImageView) findViewById(R.id.back);
-        mTitleTv = (TextView) findViewById(R.id.title);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mActionBar.setPadding(0, dp2Px(20), 0, 0);
         } else {
             mActionBar.setPadding(0, 0, 0, 0);
         }
+        mBackBtn = (ImageView) findViewById(R.id.back);
+        mTitleTv = (TextView) findViewById(R.id.title);
 
         mTitleTv.setText(String.format(getString(R.string.index), curr + 1, total));
 
         if (mAlbumView == null) {
-            mAlbumView = AlbumFragment.newInstance(mData);
+            mAlbumView = AlbumFragment.newInstance(mData, curr);
             FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.add(R.id.content, mAlbumView, AlbumFragment.class.getName());
@@ -105,6 +102,7 @@ public class AlbumActivity extends AppCompatActivity {
 
             @Override
             public void onPageChanged(int page) {
+                curr = page;
                 mTitleTv.setText(String.format(getString(R.string.index), curr + 1, total));
             }
 
@@ -172,8 +170,8 @@ public class AlbumActivity extends AppCompatActivity {
         mActionBar.startAnimation(hideAnim);
     }
 
-    public int dp2Px(int dp) {
-        DisplayMetrics dm = MyApp.getAppContext().getResources().getDisplayMetrics();
+    private int dp2Px(int dp) {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
         int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, dm);
         return px;
     }

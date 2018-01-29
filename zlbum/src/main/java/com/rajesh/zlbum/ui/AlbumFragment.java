@@ -9,9 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.rajesh.zlbum.AlbumViewPager;
-import com.rajesh.zlbum.adapter.AlbumAdapter;
-import com.rajesh.zlbum.pull.OnPullProgressListener;
+import com.rajesh.zlbum.ui.adapter.AlbumAdapter;
+import com.rajesh.zlbum.widget.AlbumViewPager;
+import com.rajesh.zlbum.widget.pull.OnPullProgressListener;
 
 import java.util.ArrayList;
 
@@ -21,16 +21,28 @@ import java.util.ArrayList;
  * @author zhufeng on 2018/1/26
  */
 public class AlbumFragment extends Fragment {
+    private static final String INTENT_IMAGE = "image";
+    private static final String INTENT_INDEX = "index";
     private static final int BLACK = 0xFF000000;
     private AlbumViewPager mAlbumView;
     private AlbumAdapter mAdapter;
-    private ArrayList<Uri> mDataList = null;
+    private ArrayList<Uri> mDataList = new ArrayList<>();
+    private int mCurrIndex = 0;
     private OnAlbumEventListener mListener;
 
-    public static AlbumFragment newInstance(ArrayList<Uri> data) {
+    public static AlbumFragment newInstance(ArrayList<String> data) {
         AlbumFragment fragment = new AlbumFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("data", data);
+        bundle.putStringArrayList(INTENT_IMAGE, data);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+    public static AlbumFragment newInstance(ArrayList<String> data, int index) {
+        AlbumFragment fragment = new AlbumFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(INTENT_IMAGE, data);
+        bundle.putInt(INTENT_INDEX, index);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -39,10 +51,15 @@ public class AlbumFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mDataList = (ArrayList<Uri>) getArguments().getSerializable("data");
-        }
-        if (mDataList == null) {
-            mDataList = new ArrayList<>();
+            mDataList.clear();
+            ArrayList<String> mDataTemp = getArguments().getStringArrayList(INTENT_IMAGE);
+            if (mDataTemp != null) {
+                for (int i = 0; i < mDataTemp.size(); i++) {
+                    mDataList.add(Uri.parse(mDataTemp.get(i)));
+                }
+            }
+            mCurrIndex = getArguments().getInt(INTENT_INDEX, 0);
+            mCurrIndex = mCurrIndex < 0 ? 0 : mCurrIndex;
         }
     }
 
@@ -64,6 +81,9 @@ public class AlbumFragment extends Fragment {
         mAlbumView.setPageMargin(30);
         mAlbumView.setAdapter(mAdapter);
         mAlbumView.setOffscreenPageLimit(1);
+        if (mCurrIndex < mDataList.size()) {
+            mAlbumView.setCurrentItem(mCurrIndex, false);
+        }
 
         mAlbumView.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -73,8 +93,9 @@ public class AlbumFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
+                mCurrIndex = position;
                 if (mListener != null) {
-                    mListener.onPageChanged(position);
+                    mListener.onPageChanged(mCurrIndex);
                 }
             }
 

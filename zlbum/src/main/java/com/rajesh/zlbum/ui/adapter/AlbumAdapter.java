@@ -1,4 +1,4 @@
-package com.rajesh.zlbum.adapter;
+package com.rajesh.zlbum.ui.adapter;
 
 import android.content.Context;
 import android.net.Uri;
@@ -6,8 +6,8 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.rajesh.zlbum.AlbumViewPager;
-import com.rajesh.zlbum.PhotoView;
+import com.rajesh.zlbum.widget.AlbumViewPager;
+import com.rajesh.zlbum.widget.PhotoView;
 
 import java.util.HashMap;
 import java.util.List;
