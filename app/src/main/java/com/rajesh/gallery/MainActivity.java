@@ -51,14 +51,14 @@ public class MainActivity extends AppCompatActivity {
                 imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg2));
                 imageUrls.add(ImageData.picUrls[0]);
                 imageUrls.add(ImageData.picUrls[1]);
+                imageUrls.add(ImageData.getUri(ImageData.picPaths[0]));
+                imageUrls.add(ImageData.getUri(ImageData.picPaths[1]));
                 imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg1));
                 imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg2));
                 imageUrls.add(ImageData.picUrls[0]);
                 imageUrls.add(ImageData.picUrls[1]);
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg1));
-                imageUrls.add(ImageData.getUriForFresco(R.mipmap.bg2));
-                imageUrls.add(ImageData.picUrls[0]);
-                imageUrls.add(ImageData.picUrls[1]);
+                imageUrls.add(ImageData.getUri(ImageData.picPaths[0]));
+                imageUrls.add(ImageData.getUri(ImageData.picPaths[1]));
 
                 Intent intent = new Intent(MainActivity.this, AlbumActivity.class);
                 intent.putExtra(AlbumActivity.INTENT_IMAGE, imageUrls);
