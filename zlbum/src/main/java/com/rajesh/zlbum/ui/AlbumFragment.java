@@ -21,27 +21,28 @@ import java.util.ArrayList;
  * @author zhufeng on 2018/1/26
  */
 public class AlbumFragment extends Fragment {
-    private static final String INTENT_IMAGE = "image";
-    private static final String INTENT_INDEX = "index";
+    private static final String INTENT_IMAGE = "extra_image";
+    private static final String INTENT_INDEX = "extra_index";
     private static final int BLACK = 0xFF000000;
+    private static final int PAGE_MARGIN = 30;
+
     private AlbumViewPager mAlbumView;
     private AlbumAdapter mAdapter;
-    private ArrayList<Uri> mDataList = new ArrayList<>();
+
+    private int mBackgroundColor = BLACK;
+    private ArrayList<Uri> mImageUris = new ArrayList<>();
     private int mCurrIndex = 0;
+
     private OnAlbumEventListener mListener;
 
-    public static AlbumFragment newInstance(ArrayList<String> data) {
-        AlbumFragment fragment = new AlbumFragment();
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList(INTENT_IMAGE, data);
-        fragment.setArguments(bundle);
-        return fragment;
+    public static AlbumFragment newInstance(ArrayList<String> images) {
+        return newInstance(images, 0);
     }
 
-    public static AlbumFragment newInstance(ArrayList<String> data, int index) {
+    public static AlbumFragment newInstance(ArrayList<String> images, int index) {
         AlbumFragment fragment = new AlbumFragment();
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(INTENT_IMAGE, data);
+        bundle.putStringArrayList(INTENT_IMAGE, images);
         bundle.putInt(INTENT_INDEX, index);
         fragment.setArguments(bundle);
         return fragment;
@@ -50,16 +51,19 @@ public class AlbumFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mDataList.clear();
-            ArrayList<String> mDataTemp = getArguments().getStringArrayList(INTENT_IMAGE);
-            if (mDataTemp != null) {
-                for (int i = 0; i < mDataTemp.size(); i++) {
-                    mDataList.add(Uri.parse(mDataTemp.get(i)));
+        Bundle extras = getArguments();
+        if (extras != null) {
+            ArrayList<String> images = extras.getStringArrayList(INTENT_IMAGE);
+            mCurrIndex = extras.getInt(INTENT_INDEX, 0);
+
+            mImageUris.clear();
+            int imageSize;
+            if (images != null && (imageSize = images.size()) > 0) {
+                for (int i = 0; i < imageSize; i++) {
+                    mImageUris.add(Uri.parse(images.get(i)));
                 }
+                mCurrIndex = (mCurrIndex >= 0 && mCurrIndex < imageSize) ? mCurrIndex : 0;
             }
-            mCurrIndex = getArguments().getInt(INTENT_INDEX, 0);
-            mCurrIndex = mCurrIndex < 0 ? 0 : mCurrIndex;
         }
     }
 
@@ -74,14 +78,15 @@ public class AlbumFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mAlbumView.setBackgroundColor(BLACK);
+        mAlbumView.setBackgroundColor(mBackgroundColor);
         mAlbumView.getBackground().setAlpha(255);
 
-        mAdapter = new AlbumAdapter(getContext(), mDataList);
-        mAlbumView.setPageMargin(30);
+        mAdapter = new AlbumAdapter(getContext(), mImageUris);
+        mAlbumView.setPageMargin(PAGE_MARGIN);
         mAlbumView.setAdapter(mAdapter);
         mAlbumView.setOffscreenPageLimit(1);
-        if (mCurrIndex < mDataList.size()) {
+
+        if (mCurrIndex < mImageUris.size()) {
             mAlbumView.setCurrentItem(mCurrIndex, false);
         }
 

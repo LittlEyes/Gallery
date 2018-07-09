@@ -25,10 +25,22 @@ public class ImageData {
             "/storage/emulated/0/MIUI/wallpaper/international_bird_&_f0b46b78-6401-44fd-99b0-e8b71d1c7660.jpg"
     };
 
+    /**
+     * transfer drawable image to uri
+     *
+     * @param res
+     * @return
+     */
     public static String getUriForFresco(int res) {
         return "res://" + MyApp.getAppContext().getPackageName() + "/" + res;
     }
 
+    /**
+     * transfer drawable image to uri
+     *
+     * @param res
+     * @return
+     */
     public static String getUri(int res) {
         Resources resources = MyApp.getAppContext().getResources();
         return ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
@@ -37,6 +49,12 @@ public class ImageData {
                 + resources.getResourceEntryName(res);
     }
 
+    /**
+     * transfer image file to uri
+     *
+     * @param path
+     * @return
+     */
     public static String getUri(String path) {
         return "file://" + path;
     }

@@ -27,8 +27,9 @@ import java.util.ArrayList;
  * @author zhufeng on 2017/10/22
  */
 public class AlbumActivity extends AppCompatActivity {
-    public static final String INTENT_IMAGE = "image";
-    public static final String INTENT_INDEX = "index";
+    public static final String INTENT_IMAGE = "extra_image";
+    public static final String INTENT_INDEX = "extra_index";
+    private static final String INDEX = "%1$01d/%2$01d";
     private AlbumFragment mAlbumView;
     private LinearLayout mActionBar;
     private ImageView mBackBtn;
@@ -103,7 +104,7 @@ public class AlbumActivity extends AppCompatActivity {
             @Override
             public void onPageChanged(int page) {
                 curr = page;
-                mTitleTv.setText(String.format(getString(R.string.index), curr + 1, total));
+                mTitleTv.setText(String.format(INDEX, curr + 1, total));
             }
 
             @Override
@@ -119,18 +120,14 @@ public class AlbumActivity extends AppCompatActivity {
     }
 
     private void translucentStatusBar() {
+        Window window = getWindow();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.TRANSPARENT);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window window = getWindow();
-            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
     }
 

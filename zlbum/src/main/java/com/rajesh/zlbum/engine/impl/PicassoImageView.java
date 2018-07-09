@@ -1,4 +1,4 @@
-package com.rajesh.zlbum.engine;
+package com.rajesh.zlbum.engine.impl;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.rajesh.zlbum.engine.IRender;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 

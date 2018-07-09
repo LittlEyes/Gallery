@@ -15,7 +15,7 @@ import android.view.ViewConfiguration;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
-import com.rajesh.zlbum.engine.FrescoImageView;
+import com.rajesh.zlbum.engine.impl.FrescoImageView;
 import com.rajesh.zlbum.widget.pull.OnPullProgressListener;
 
 /**

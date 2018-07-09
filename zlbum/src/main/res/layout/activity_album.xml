@@ -23,7 +23,8 @@
             android:layout_height="?attr/actionBarSize"
             android:paddingLeft="16dp"
             android:scaleType="centerInside"
-            android:src="@mipmap/icon_back" />
+            android:src="@drawable/abc_ic_ab_back_material"
+            android:tint="@android:color/white" />
 
         <TextView
             android:id="@+id/title"

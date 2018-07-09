@@ -1,4 +1,4 @@
-package com.rajesh.zlbum.engine;
+package com.rajesh.zlbum.engine.impl;
 
 import android.content.Context;
 import android.graphics.drawable.Animatable;
@@ -22,6 +22,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.rajesh.zlbum.R;
+import com.rajesh.zlbum.engine.IRender;
 
 /**
  * 提供加载图片宽高

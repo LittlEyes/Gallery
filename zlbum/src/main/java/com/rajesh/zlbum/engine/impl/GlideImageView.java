@@ -1,4 +1,4 @@
-package com.rajesh.zlbum.engine;
+package com.rajesh.zlbum.engine.impl;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,6 +14,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.rajesh.zlbum.R;
+import com.rajesh.zlbum.engine.IRender;
 
 /**
  * 提供加载图片宽高

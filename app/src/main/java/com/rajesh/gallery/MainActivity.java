@@ -54,12 +54,6 @@ public class MainActivity extends AppCompatActivity {
         imageUri.add(ImageData.picUrls[1]);
         imageUri.add(ImageData.getUri(ImageData.picPaths[0]));
         imageUri.add(ImageData.getUri(ImageData.picPaths[1]));
-        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg1));
-        imageUri.add(ImageData.getUriForFresco(R.mipmap.bg2));
-        imageUri.add(ImageData.picUrls[0]);
-        imageUri.add(ImageData.picUrls[1]);
-        imageUri.add(ImageData.getUri(ImageData.picPaths[0]));
-        imageUri.add(ImageData.getUri(ImageData.picPaths[1]));
     }
 
     private void initEvents() {
